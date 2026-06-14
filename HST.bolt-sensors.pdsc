@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package schemaVersion="1.7.2" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="PACK.xsd">
+  
+  <vendor>HST</vendor>
+  <name>bolt-sensors</name>
+  <description>Hardware-agnostic sensor drivers and CMSIS adapters for flight software.</description>
+  
+  <url>https://github.com/hamburg-space-team/bolt-sensors/releases/latest/download/</url>
+
+  <repository type="git">https://github.com/hamburg-space-team/bolt-sensors.git</repository>
+
+  <license>LICENSE</license>
+
+  <keywords>
+    <keyword>Sensor</keyword>
+    <keyword>I2C</keyword>
+    <keyword>CMSIS</keyword>
+    <keyword>HIC++</keyword>
+  </keywords>
+
+  <releases>
+    <release version="1.0.0" date="2026-06-14">
+      Initial Release: HIC++ compliant sensor architecture.
+    </release>
+  </releases>
+
+  <conditions>
+    <condition id="Requires_Sensor_Interfaces">
+      <description>Requires the base Sensor Interfaces</description>
+      <require Cclass="Sensor" Cgroup="Interfaces"/>
+    </condition>
+
+    <condition id="Requires_CMSIS_I2C">
+      <description>Requires Interfaces and ARM CMSIS I2C Driver</description>
+      <require condition="Requires_Sensor_Interfaces"/>
+      <require Cclass="CMSIS Driver" Cgroup="I2C"/>
+    </condition>
+  </conditions>
+
+  <components>
+    <component Cclass="Sensor" Cgroup="Interfaces" Cversion="1.0.0">
+      <description>Bus communication interfaces</description>
+      <files>
+        <file category="include" name="sensor-interfaces/include/"/>
+      </files>
+    </component>
+
+    <component Cclass="Sensor" Cgroup="Drivers" Csub="TMP117" Cversion="1.0.0" condition="Requires_Sensor_Interfaces">
+      <description>TMP117 Temperature Sensor driver</description>
+      <files>
+        <file category="include" name="sensor-drivers/include/"/>
+        <file category="source" name="sensor-drivers/src/tmp117.cpp"/>
+      </files>
+    </component>
+
+    <component Cclass="Sensor" Cgroup="Adapters" Csub="CMSIS I2C" Cversion="1.0.0" condition="Requires_CMSIS_I2C">
+      <description>Uses CMSIS ARM_DRIVER_I2C API for I2C communication</description>
+      <files>
+        <file category="include" name="hardware-adapters/include/"/>
+        <file category="source" name="hardware-adapters/src/cmsis_i2c_bus.cpp"/>
+      </files>
+    </component>
+  </components>
+</package>
