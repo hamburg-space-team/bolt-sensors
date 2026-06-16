@@ -8,6 +8,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_library(Sensors STATIC)
 target_sources(Sensors PRIVATE
+    sensor-drivers/src/device_base.cpp
     sensor-drivers/src/tmp117.cpp
 )
 
@@ -35,7 +36,10 @@ target_include_directories(HardwareAdapters PUBLIC
 # I2C adapter providing mock data for example executable
 add_library(MockAdapter STATIC)
 target_sources(MockAdapter PRIVATE hardware-adapters/src/mock_i2c_bus.cpp)
-target_include_directories(MockAdapter PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/hardware-adapters/include)
+target_include_directories(MockAdapter PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR}/hardware-adapters/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/sensor-interfaces/include
+)
 
 # Library component naming example
 add_library(HST::Sensor::Interfaces ALIAS Sensors)

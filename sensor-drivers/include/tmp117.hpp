@@ -5,18 +5,13 @@
 #include "device_base.hpp"
 #include "errors.hpp"
 #include "i2c_bus.hpp"
+#include "samples.hpp"
 
 namespace Sensor {
 
     /// @defgroup sensors Sensor drivers
 
     constexpr uint8_t TMP117_DEFAULT_ADDR = 0x48U;
-
-    struct TMP117Sample {
-        int16_t raw_value;
-
-        // TODO: add helper functions to retrieve the temperature in celcius, kelvin and fahrenheit
-    };
 
     /// TI TMP117 temperature sensor, continuous conversion mode. After
     /// init() the sensor delivers a fresh sample every ~1s at 64-cycle
@@ -36,7 +31,7 @@ namespace Sensor {
 
         /// Read the raw temperature register and return a sample.
         // Failures latch via DeviceBase.
-        [[nodiscard]] Result<TMP117Sample> read() noexcept;
+        [[nodiscard]] Result<TemperatureSample> read() noexcept;
 
       private:
         static constexpr uint8_t REG_TEMP = 0x00U;

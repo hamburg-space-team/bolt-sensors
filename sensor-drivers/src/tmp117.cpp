@@ -16,7 +16,7 @@ namespace Sensor {
         return this->bus.write_reg16(addr, REG_CONFIG, CONFIG_CONTINUOUS);
     }
 
-    Result<TMP117Sample> TMP117::read() noexcept {
+    Result<TemperatureSample> TMP117::read() noexcept {
         if (is_failed()) {
             return std::unexpected(Error::DISABLED);
         }
@@ -28,7 +28,7 @@ namespace Sensor {
         }
 
         clear_failures();
-        return TMP117Sample{static_cast<int16_t>(*raw_u)};
+        return TemperatureSample{static_cast<int16_t>(*raw_u)};
     }
 
 } // namespace Sensor

@@ -1,14 +1,12 @@
 {
-    "files.exclude": {
+    "search.exclude": {
         "**/build": true,
         "**/RTE": true,
-    },
-    "search.exclude": {
         "**/vendor": true
     },
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "xaver.clang-format",
-    "C_Cpp.intelliSenseEngine": "disabled", 
+    "C_Cpp.intelliSenseEngine": "disabled",
     "clangd.arguments": [
         "--background-index",
         "--clang-tidy",
