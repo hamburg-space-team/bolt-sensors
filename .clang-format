@@ -6,3 +6,4 @@ AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: Never
 NamespaceIndentation: All
 PackConstructorInitializers: Never
+IndentCaseLabels: true
