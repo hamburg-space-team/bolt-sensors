@@ -15,21 +15,32 @@ namespace Sensor {
     /// Wraps ARM_DRIVER_I2C with a register-oriented API. One instance per
     /// physical I2C controller. Every transaction is bounded: by the
     /// optional ms-tick when supplied, otherwise by a fixed-iteration spin
-    /// (I-2). All fallible calls return Result<void> or Result<value>; the
-    /// error code carries the cause back to the caller.
+    /// (I-2). All fallible calls return Result<void> or Result<value>.
     ///
     /// @ingroup adapter
     class CmsisI2CBus final : public I2CBus {
       public:
         using TickFn = uint32_t (*)();
 
-        /// tick = nullptr falls back to the iteration-count timeout.
-        explicit CmsisI2CBus(ARM_DRIVER_I2C* drv, TickFn tick = nullptr) noexcept;
+        /// Core constructor requiring an explicit tick function for precise hardware timeouts.
+        explicit CmsisI2CBus(ARM_DRIVER_I2C* drv, TickFn tick) noexcept
+            : drv_(drv),
+              get_tick_(tick) {
+        }
 
-        /// Initialize the underlying CMSIS driver, bring it to full power,
-        /// configure for fast mode (400 kHz). Must be called once before
+        /// Falls back to iteration-count timeouts.
+        explicit CmsisI2CBus(ARM_DRIVER_I2C* drv) noexcept
+            : CmsisI2CBus(drv, nullptr) {
+        }
+
+        /// Initialize the underlying CMSIS driver. Must be called once before
         /// any read/write.
         [[nodiscard]] Result<void> init() noexcept;
+
+        /// Full peripheral reset: powers the CMSIS driver off (HAL_I2C_DeInit,
+        /// which releases SCL/SDA and clears any latched BERR / arbitration-lost /
+        /// lock-up), then re-runs init().
+        [[nodiscard]] Result<void> reset() noexcept;
 
         [[nodiscard]] Result<void> write(uint8_t addr, const uint8_t* data, std::size_t len) noexcept override;
         [[nodiscard]] Result<void> read(uint8_t addr, uint8_t* data, std::size_t len) noexcept override;
@@ -44,13 +55,24 @@ namespace Sensor {
         [[nodiscard]] Result<uint16_t> read_reg16(uint8_t addr, uint8_t reg) noexcept override;
 
       private:
+        /// SignalEvent callback registered with the CMSIS driver. The callback
+        /// type carries no user context, so the latched event is necessarily
+        /// shared static state
+        static void signal_event(uint32_t event) noexcept;
+        static volatile uint32_t last_event;
+
+        /// Block until the SignalEvent callback reports the transaction finished,
+        /// then map the event bitmask to a Result.
+        [[nodiscard]] Result<void> wait_complete() noexcept;
+
+        [[nodiscard]] bool wait_idle() noexcept;
+
+      private:
         static constexpr uint32_t BUSY_TIMEOUT = 100000U;
-        static constexpr uint32_t I2C_TIMEOUT_MS = 2U;
+        static constexpr uint32_t I2C_TIMEOUT_MS = 25U;
 
-        ARM_DRIVER_I2C* drv = nullptr;
-        TickFn get_tick = nullptr;
-
-        [[nodiscard]] Result<void> wait_busy() const noexcept;
+        ARM_DRIVER_I2C* drv_ = nullptr;
+        TickFn get_tick_ = nullptr;
     };
 
 } // namespace Sensor

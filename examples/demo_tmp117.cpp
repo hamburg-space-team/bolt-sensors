@@ -5,23 +5,38 @@
 #include <samples.hpp>
 #include <tmp117.hpp>
 
+static void print_error(const Sensor::Error& e) {
+    std::println("===== Error =====");
+    std::println("  Code:      {}", std::to_underlying(e.code));
+    std::println("  Line:      {}", e.line);
+    std::println("  Timestamp: {} us", e.timestamp_us);
+
+    std::print("  Trace:     [");
+    for (uint8_t i = 0U; i < e.depth; ++i) {
+        std::print("0x{:02X}{}", std::to_underlying(e.trace[i]), (i < e.depth - 1U) ? " <- " : "");
+    }
+    std::println("]{}", e.truncated ? " (TRUNCATED)" : "");
+
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-union-access)
+    std::println("  Context:   0x{:08X}", e.context.raw);
+}
+
 int main() {
     Sensor::MockI2CBus bus;
-    if (auto result = bus.init(); !result) {
-        std::println("I2C initialization failed with error code: {}", std::to_underlying(result.error()));
+    if (const auto r = bus.init(); !r) {
+        print_error(r.error());
         return -1;
     }
 
     Sensor::TMP117 tmp117(bus);
-    if (auto result = tmp117.init(); !result) {
-        std::println("TMP117 initialization failed with error code: {}", std::to_underlying(result.error()));
+    if (const auto r = tmp117.init(); !r) {
+        print_error(r.error());
         return -1;
     }
 
-    auto temp_sample = tmp117.read();
+    const auto temp_sample = tmp117.read();
     if (!temp_sample) {
-        std::println("Reading TMP117 temperature sample failed with error code: {}",
-                     std::to_underlying(temp_sample.error()));
+        print_error(temp_sample.error());
         return -1;
     }
 

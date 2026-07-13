@@ -1,30 +1,36 @@
 #include "tmp117.hpp"
+#include "errors.hpp"
 
 namespace Sensor {
 
     Result<void> TMP117::init() noexcept {
-        auto dev_id = this->bus.read_reg16(addr, REG_DEV_ID);
+        const auto dev_id = bus_.read_reg16(addr_, REG_DEV_ID);
         if (!dev_id) {
-            return std::unexpected(dev_id.error());
+            return mark(dev_id.error(), Step::TMP_INIT);
         }
 
         if ((*dev_id & DEV_ID_MASK) != DEV_ID_EXPECTED) {
-            disable(); // Immediately disable: A device responded but it is not a TMP117.
-            return std::unexpected(Error::PROTOCOL_ERROR);
+            return fail(ErrorCode::PROTOCOL_ERROR, Step::TMP_ID_CHECK, __LINE__, ErrorContext::from_id(*dev_id));
         }
 
-        return this->bus.write_reg16(addr, REG_CONFIG, CONFIG_CONTINUOUS);
+        if (const auto r = bus_.write_reg16(addr_, REG_CONFIG, CONFIG_CONTINUOUS); !r) {
+            return mark(r.error(), Step::TMP_CONFIG);
+        }
+
+        return {};
     }
 
     Result<TemperatureSample> TMP117::read() noexcept {
         if (is_failed()) {
-            return std::unexpected(Error::DISABLED);
+            return fail(ErrorCode::DISABLED, Step::TMP_READ, __LINE__, ErrorContext::from_device(addr_));
         }
 
-        auto raw_u = this->bus.read_reg16(addr, REG_TEMP);
+        const auto raw_u = bus_.read_reg16(addr_, REG_TEMP);
         if (!raw_u) {
-            register_failure();
-            return std::unexpected(raw_u.error());
+            const auto marked = mark(raw_u.error(), Step::TMP_READ);
+            register_failure(marked.error());
+
+            return marked;
         }
 
         clear_failures();

@@ -21,16 +21,20 @@ namespace Sensor {
     /// @ingroup sensors
     class TMP117 final : public DeviceBase {
       public:
-        explicit TMP117(I2CBus& bus, uint8_t addr = TMP117_DEFAULT_ADDR) noexcept
-            : bus(bus),
-              addr(addr) {
+        explicit TMP117(I2CBus& bus, uint8_t addr) noexcept
+            : bus_(bus),
+              addr_(addr) {
+        }
+
+        explicit TMP117(I2CBus& bus) noexcept
+            : TMP117(bus, TMP117_DEFAULT_ADDR) {
         }
 
         /// Verify device ID and switch to continuous conversion.
         [[nodiscard]] Result<void> init() noexcept;
 
-        /// Read the raw temperature register and return a sample.
-        // Failures latch via DeviceBase.
+        /// Read the raw temperature register and return a sample. Failures
+        /// latch via DeviceBase.
         [[nodiscard]] Result<TemperatureSample> read() noexcept;
 
       private:
@@ -43,8 +47,9 @@ namespace Sensor {
 
         static constexpr uint16_t CONFIG_CONTINUOUS = 0x0000U;
 
-        I2CBus& bus;
-        uint8_t addr = 0U;
+      private:
+        I2CBus& bus_;
+        uint8_t addr_ = 0U;
     };
 
 } // namespace Sensor
