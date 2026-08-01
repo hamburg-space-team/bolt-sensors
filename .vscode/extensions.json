@@ -2,6 +2,7 @@
     "recommendations": [
         "llvm-vs-code-extensions.vscode-clangd",
         "xaver.clang-format",
-        "ms-vscode.cmake-tools"
+        "ms-vscode.cmake-tools",
+        "arm.keil-studio-pack"
     ]
 }

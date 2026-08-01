@@ -44,13 +44,14 @@ target_include_directories(MockAdapter PUBLIC
 # Library component naming example
 add_library(HST::Sensor::Interfaces ALIAS Sensors)
 add_library(HST::Sensor::Drivers::TMP117 ALIAS Sensors)
-add_library(HST::Sensor::Adapters::CMSISI2C ALIAS Sensors)     # production
-add_library(HST::Sensor::Adapters::MockI2C ALIAS MockAdapter)  # local mock data I2C adapter
+add_library(HST::Sensor::Adapters::CMSISI2C ALIAS HardwareAdapters)  # hardware I2C bus (not used in CMake)
+add_library(HST::Sensor::Adapters::MockI2C ALIAS MockAdapter)        # local mock data I2C adapter
 
 
 # Example executables
-add_executable(demo_tmp117 examples/demo_tmp117.cpp)
+add_executable(demo_tmp117 examples/tmp117/demo_tmp117.cpp)
 target_link_libraries(demo_tmp117 PRIVATE
+    HST::Sensor::Interfaces
     HST::Sensor::Drivers::TMP117
     HST::Sensor::Adapters::MockI2C
 )

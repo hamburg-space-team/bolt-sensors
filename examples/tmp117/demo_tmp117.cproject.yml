@@ -1,0 +1,38 @@
+project:
+  rte:
+    base-dir: ../generated/RTE/tmp117
+
+  define:
+    - BUILD_TARGET_HARDWARE
+
+  generators:
+    options:
+      - generator: CubeMX
+        path: ../generated
+        name: sensor_node_config
+
+  components:
+    - component: Device:CubeMX
+    - component: ARM::CMSIS:CORE
+    - component: ARM::CMSIS-Compiler:CORE
+    - component: CMSIS Driver:I2C
+
+  linker:
+    - script: ../generated/STM32CubeMX/STM32CubeIDE/STM32L476RGTX_FLASH.ld
+      for-compiler: GCC
+
+  add-path:
+    - ../../sensor-interfaces/include
+    - ../../sensor-drivers/include
+    - ../../hardware-adapters/include
+
+  groups:
+    - group: Demo
+      files:
+        - file: demo_tmp117.cpp
+
+    - group: Sensors
+      files:
+        - file: ../../sensor-drivers/src/device_base.cpp
+        - file: ../../sensor-drivers/src/tmp117.cpp
+        - file: ../../hardware-adapters/src/cmsis_i2c_bus.cpp

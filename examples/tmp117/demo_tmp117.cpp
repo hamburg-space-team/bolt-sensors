@@ -1,11 +1,18 @@
 #include <print>
 #include <utility>
 
-#include <mock_i2c_bus.hpp>
 #include <samples.hpp>
 #include <tmp117.hpp>
 
-static void print_error(const Sensor::Error& e) {
+#ifdef BUILD_TARGET_HARDWARE
+#include <cmsis_i2c_bus.hpp>
+// NOLINTNEXTLINE(readability-identifier-naming)
+extern ARM_DRIVER_I2C Driver_I2C1;
+#else
+#include <mock_i2c_bus.hpp>
+#endif
+
+void print_error(const Sensor::Error& e) {
     std::println("===== Error =====");
     std::println("  Code:      {}", std::to_underlying(e.code));
     std::println("  Line:      {}", e.line);
@@ -22,7 +29,11 @@ static void print_error(const Sensor::Error& e) {
 }
 
 int main() {
+#ifdef BUILD_TARGET_HARDWARE
+    Sensor::CmsisI2CBus bus(&Driver_I2C1);
+#else
     Sensor::MockI2CBus bus;
+#endif
     if (const auto r = bus.init(); !r) {
         print_error(r.error());
         return -1;

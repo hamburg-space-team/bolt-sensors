@@ -1,15 +1,15 @@
 {
     "search.exclude": {
         "**/build": true,
-        "**/RTE": true,
+        "**/generated": true,
         "**/vendor": true
     },
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "xaver.clang-format",
     "C_Cpp.intelliSenseEngine": "disabled",
     "clangd.arguments": [
-        "--background-index",
-        "--clang-tidy",
-        "--header-insertion=iwyu"
-    ]
+        "--compile-commands-dir=/home/mark/dev/hamburg_space/bolt-sensors/examples/out/%{target-type}/%{project}"
+    ],
+    "debug.hideSlowPreLaunchWarning": true,
+    "debug.showInStatusBar": "never"
 }

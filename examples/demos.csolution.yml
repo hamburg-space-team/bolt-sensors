@@ -1,0 +1,30 @@
+solution:
+  compiler: GCC
+
+  misc:
+    - for-compiler: GCC
+      CPP:
+        - -std=gnu++23
+        - -fno-exceptions
+        - -fno-rtti
+
+  target-types:
+    - type: sensor-node
+      device: STM32L476RGTx
+
+  build-types:
+    - type: Debug
+      debug: on
+      optimize: none
+    - type: Release
+      debug: off
+      optimize: speed
+
+  packs:
+    - pack: ARM::CMSIS@6.3.0
+    - pack: ARM::CMSIS-Compiler@2.2.0
+    - pack: Keil::STM32L4xx_DFP@3.1.0
+    - pack: ARM::CMSIS-Driver_STM32@1.3.0
+
+  projects:
+    - project: tmp117/demo_tmp117.cproject.yml
