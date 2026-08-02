@@ -1,3 +1,4 @@
+#include <cinttypes>
 #include <utility>
 
 #include "demo_print.hpp"
@@ -31,7 +32,7 @@ void print_error(const Sensor::Error& e) {
     demo_println("===== Error =====");
     demo_println("  Code:      %u", std::to_underlying(e.code));
     demo_println("  Line:      %u", e.line);
-    demo_println("  Timestamp: %lu us", e.timestamp_us);
+    demo_println("  Timestamp: %" PRIu32 " us", e.timestamp_us);
 
     demo_print("  Trace:     [");
     for (uint8_t i = 0U; i < e.depth; ++i) {
@@ -40,7 +41,7 @@ void print_error(const Sensor::Error& e) {
     demo_println("]%s", e.truncated ? " (TRUNCATED)" : "");
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-union-access)
-    demo_println("  Context:   0x%08lX", e.context.raw);
+    demo_println("  Context:   0x%08" PRIX32, e.context.raw);
 }
 
 #ifdef BUILD_TARGET_HARDWARE

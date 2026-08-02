@@ -52,7 +52,7 @@ template <typename... Args> void demo_println(const char* fmt, Args... args) {
 #else
 
 template <typename... Args> void demo_print(const char* fmt, Args... args) {
-    if constexpr (sizeof...(args) == 0) {
+    if constexpr (sizeof...(Args) == 0) {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg, hicpp-vararg)
         std::printf("%s", fmt);
     } else {
