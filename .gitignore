@@ -1,5 +1,8 @@
-# Build and cache
+# Cache
 .cache/
+*/.cache/
+
+# CMake
 build/
 
 # CMSIS-Toolbox artifacts
@@ -12,11 +15,16 @@ tmp/
 *.cbuild-gen.yml
 *.cbuild-gen-idx.yml
 
-# Hardware configuration (CubeMX)
-examples/**/generated/*
-!examples/**/generated/STM32CubeMX/
-examples/**/generated/STM32CubeMX/*
-!examples/**/generated/STM32CubeMX/*.ioc
+# Hardware configuration
+**/RTE/
+**/cubemx/.cproject
+**/cubemx/.project
+**/cubemx/.settings/
+**/cubemx/.mxproject
+**/generated/STM32CubeMX/STM32CubeIDE/.cproject
+**/generated/STM32CubeMX/STM32CubeIDE/.project
+**/generated/STM32CubeMX/STM32CubeIDE/.settings/
+**/generated/project.script
 
 # VS Code
 .vscode/*
