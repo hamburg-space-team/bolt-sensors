@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-
+# Core hardware independent sensor logic
 add_library(Sensors STATIC)
 target_sources(Sensors PRIVATE
     sensor-drivers/src/device_base.cpp
@@ -18,40 +18,29 @@ target_include_directories(Sensors PUBLIC
 )
 
 
-# Hardware Adapters target for VS Code IntelliSense
-add_library(HardwareAdapters STATIC)
-
-target_sources(HardwareAdapters PRIVATE 
-    hardware-adapters/src/cmsis_i2c_bus.cpp
-)
-
-target_include_directories(HardwareAdapters PUBLIC 
-    ${CMAKE_CURRENT_SOURCE_DIR}/hardware-adapters/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/sensor-interfaces/include
-
-    ${CMAKE_CURRENT_SOURCE_DIR}/hardware-adapters/vendor/cmsis
-)
-
-
-# I2C adapter providing mock data for example executable
-add_library(MockAdapter STATIC)
-target_sources(MockAdapter PRIVATE hardware-adapters/src/mock_i2c_bus.cpp)
-target_include_directories(MockAdapter PUBLIC 
+# Mock adapters for native host execution
+add_library(MockAdapters STATIC)
+target_sources(MockAdapters PRIVATE hardware-adapters/src/mock_i2c_bus.cpp)
+target_include_directories(MockAdapters PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}/hardware-adapters/include
     ${CMAKE_CURRENT_SOURCE_DIR}/sensor-interfaces/include
 )
 
-# Library component naming example
-add_library(HST::Sensor::Interfaces ALIAS Sensors)
-add_library(HST::Sensor::Drivers::TMP117 ALIAS Sensors)
-add_library(HST::Sensor::Adapters::CMSISI2C ALIAS HardwareAdapters)  # hardware I2C bus (not used in CMake)
-add_library(HST::Sensor::Adapters::MockI2C ALIAS MockAdapter)        # local mock data I2C adapter
 
-
-# Example executables
-add_executable(demo_tmp117 examples/tmp117/demo_tmp117.cpp)
-target_link_libraries(demo_tmp117 PRIVATE
-    HST::Sensor::Interfaces
-    HST::Sensor::Drivers::TMP117
-    HST::Sensor::Adapters::MockI2C
+# Example executables for different boards
+set(BOARDS
+    "mission-bolt-btc"
 )
+
+foreach(BOARD IN LISTS BOARDS)
+    string(REPLACE "-" "_" BOARD_TARGET_NAME ${BOARD})
+
+    add_executable(demo_${BOARD_TARGET_NAME} examples/${BOARD}/demo_${BOARD_TARGET_NAME}.cpp)
+    
+    target_link_libraries(demo_${BOARD_TARGET_NAME} PRIVATE
+        Sensors
+        MockAdapters
+    )
+endforeach()
+
+

@@ -1,6 +1,6 @@
 project:
   rte:
-    base-dir: ../generated/RTE/tmp117
+    base-dir: ./generated/RTE
 
   define:
     - BUILD_TARGET_HARDWARE
@@ -8,8 +8,8 @@ project:
   generators:
     options:
       - generator: CubeMX
-        path: ../generated
-        name: sensor_node_config
+        path: ./generated
+        name: mission_bolt_btc_config
 
   components:
     - component: Device:CubeMX
@@ -18,7 +18,7 @@ project:
     - component: CMSIS Driver:I2C
 
   linker:
-    - script: ../generated/STM32CubeMX/STM32CubeIDE/STM32L476RGTX_FLASH.ld
+    - script: ./generated/STM32CubeMX/STM32CubeIDE/STM32L476RGTX_FLASH.ld
       for-compiler: GCC
 
   add-path:
@@ -29,7 +29,7 @@ project:
   groups:
     - group: Demo
       files:
-        - file: demo_tmp117.cpp
+        - file: demo_mission_bolt_btc.cpp
 
     - group: Sensors
       files:

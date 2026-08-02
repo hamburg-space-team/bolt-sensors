@@ -9,7 +9,7 @@ solution:
         - -fno-rtti
 
   target-types:
-    - type: sensor-node
+    - type: mission-bolt-btc
       device: STM32L476RGTx
 
   build-types:
@@ -27,4 +27,4 @@ solution:
     - pack: ARM::CMSIS-Driver_STM32@1.3.0
 
   projects:
-    - project: tmp117/demo_tmp117.cproject.yml
+    - project: mission-bolt-btc/demo.cproject.yml

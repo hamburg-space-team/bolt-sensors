@@ -1,0 +1,181 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        // ====================================================
+        // Auto-generated CMSIS tasks for extension UI buttons
+        // ====================================================
+        {
+            "label": "CMSIS Erase",
+            "type": "shell",
+            "command": "pyocd",
+            "options": {
+                "cwd": "${workspaceFolder}/examples",
+                "shell": {
+                    "executable": "/bin/bash",
+                    "args": [
+                        "-c"
+                    ]
+                }
+            },
+            "args": [
+                "erase",
+                "--probe",
+                "cmsisdap:",
+                "--chip",
+                "--cbuild-run",
+                "${command:cmsis-csolution.getCbuildRunFile}"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "CMSIS Load",
+            "type": "shell",
+            "command": "pyocd",
+            "options": {
+                "cwd": "${workspaceFolder}/examples",
+                "shell": {
+                    "executable": "/bin/bash",
+                    "args": [
+                        "-c"
+                    ]
+                }
+            },
+            "args": [
+                "load",
+                "--probe",
+                "cmsisdap:",
+                "--cbuild-run",
+                "${command:cmsis-csolution.getCbuildRunFile}"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "CMSIS Run",
+            "type": "shell",
+            "command": "pyocd",
+            "options": {
+                "cwd": "${workspaceFolder}/examples",
+                "shell": {
+                    "executable": "/bin/bash",
+                    "args": [
+                        "-c"
+                    ]
+                }
+            },
+            "args": [
+                "gdbserver",
+                "--probe",
+                "cmsisdap:",
+                "--connect",
+                "attach",
+                "--persist",
+                "--reset-run",
+                "--cbuild-run",
+                "${command:cmsis-csolution.getCbuildRunFile}",
+                "--quiet",
+                "--log",
+                "*.cbuild_run,*server=info"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "CMSIS Load+Run",
+            "dependsOn": [
+                "CMSIS Load",
+                "CMSIS Run"
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher": []
+        },
+        {
+            "label": "CMSIS TargetInfo",
+            "type": "shell",
+            "command": "pyocd",
+            "options": {
+                "cwd": "${workspaceFolder}/examples",
+                "shell": {
+                    "executable": "/bin/bash",
+                    "args": [
+                        "-c"
+                    ]
+                }
+            },
+            "args": [
+                "list",
+                "--cbuild-run",
+                "${command:cmsis-csolution.getCbuildRunFile}"
+            ],
+            "problemMatcher": []
+        },
+        // =========================================================
+        // Generation/configuration tasks (local host and hardware)
+        // =========================================================
+        {
+            "label": "Configure: Local CMake Compile Commands",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-B",
+                "build/${input:buildType}",
+                "-S",
+                ".",
+                "-DCMAKE_BUILD_TYPE=${input:buildType}"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Configure: Hardware CSolution Compile Commands",
+            "type": "shell",
+            "command": "csolution",
+            "args": [
+                "convert",
+                "-s",
+                "examples/demos.csolution.yml",
+                "-c",
+                "demo.${input:buildType}+${input:boardTarget}"
+            ],
+            "problemMatcher": []
+        },
+        // ==========================================================
+        // Clangd context switchers (depends on configuration tasks)
+        // ==========================================================
+        {
+            "label": "Context: Native Host",
+            "dependsOn": "Configure: Local CMake Compile Commands",
+            "type": "shell",
+            "command": "cmake -E copy build/${input:buildType}/compile_commands.json .vscode/active_context/compile_commands.json && cmake -E touch .clangd",
+            "problemMatcher": []
+        },
+        {
+            "label": "Context: Hardware Board",
+            "dependsOn": "Configure: Hardware CSolution Compile Commands",
+            "type": "shell",
+            "command": "cmake -E copy examples/out/demo/${input:boardTarget}/${input:buildType}/compile_commands.json .vscode/active_context/compile_commands.json && cmake -E touch .clangd",
+            "problemMatcher": []
+        }
+    ],
+    // ====================
+    // Interactive Prompts
+    // ====================
+    "inputs": [
+        {
+            "id": "boardTarget",
+            "type": "pickString",
+            "description": "Select Board Environment",
+            "options": [
+                "mission-bolt-btc"
+            ],
+            "default": "mission-bolt-btc"
+        },
+        {
+            "id": "buildType",
+            "type": "pickString",
+            "description": "Select Build Type",
+            "options": [
+                "Debug",
+                "Release"
+            ],
+            "default": "Debug"
+        }
+    ]
+}

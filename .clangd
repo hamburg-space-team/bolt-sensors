@@ -1,5 +1,5 @@
 CompileFlags:
-  CompilationDatabase: build/
+  CompilationDatabase: .vscode/active_context/
   Add:
     - -std=gnu++2b
     - -xc++

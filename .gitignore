@@ -1,8 +1,6 @@
 # Build and cache
 .cache/
 build/
-.clangd
-!/.clangd
 
 # CMSIS-Toolbox artifacts
 out/
@@ -15,11 +13,13 @@ tmp/
 *.cbuild-gen-idx.yml
 
 # Hardware configuration (CubeMX)
-examples/generated/
-!examples/generated/STM32CubeMX/STM32CubeMX.ioc
+examples/**/generated/*
+!examples/**/generated/STM32CubeMX/STM32CubeMX.ioc
 
 # VS Code
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
+!.vscode/tasks.json
+!.vscode/active_context/
 .vscode/.ipch/

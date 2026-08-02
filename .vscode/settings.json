@@ -8,12 +8,8 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "xaver.clang-format",
     "C_Cpp.intelliSenseEngine": "disabled",
-    "clangd.arguments": [
-        "--background-index",
-        "--clang-tidy",
-        "--header-insertion=iwyu"
-    ],
-    "cmsis-csolution.clangd.enabled": false,
+    "cmsis-csolution.generateClangSetup": false,
+    "clangd.arguments": [],
     "debug.hideSlowPreLaunchWarning": true,
     "debug.showInStatusBar": "never"
 }
