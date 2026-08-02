@@ -41,6 +41,10 @@ foreach(BOARD IN LISTS BOARDS)
         Sensors
         MockAdapters
     )
+
+    target_include_directories(demo_${BOARD_TARGET_NAME} PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/examples/common/
+    )
 endforeach()
 
 

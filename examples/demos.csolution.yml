@@ -1,12 +1,19 @@
 solution:
   compiler: GCC
 
+  add-path:
+    - common
+
   misc:
     - for-compiler: GCC
       CPP:
         - -std=gnu++23
         - -fno-exceptions
         - -fno-rtti
+      Link:
+        - --specs=nano.specs
+        - --specs=nosys.specs
+        - -Wl,--no-warn-rwx-segments
 
   target-types:
     - type: mission-bolt-btc
