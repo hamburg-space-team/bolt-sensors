@@ -14,12 +14,14 @@ tmp/
 
 # Hardware configuration (CubeMX)
 examples/**/generated/*
-!examples/**/generated/STM32CubeMX/STM32CubeMX.ioc
+!examples/**/generated/STM32CubeMX/
+examples/**/generated/STM32CubeMX/*
+!examples/**/generated/STM32CubeMX/*.ioc
 
 # VS Code
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
 !.vscode/tasks.json
-!.vscode/active_context/
+# !.vscode/active_context/
 .vscode/.ipch/
