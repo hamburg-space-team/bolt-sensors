@@ -23,5 +23,4 @@ examples/**/generated/STM32CubeMX/*
 !.vscode/settings.json
 !.vscode/extensions.json
 !.vscode/tasks.json
-# !.vscode/active_context/
 .vscode/.ipch/
