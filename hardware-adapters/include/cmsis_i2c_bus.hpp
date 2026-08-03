@@ -67,7 +67,6 @@ namespace Sensor {
 
         [[nodiscard]] bool wait_idle() noexcept;
 
-      private:
         static constexpr uint32_t BUSY_TIMEOUT = 100000U;
         static constexpr uint32_t I2C_TIMEOUT_MS = 25U;
 

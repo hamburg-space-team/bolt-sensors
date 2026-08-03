@@ -20,7 +20,7 @@ namespace Sensor {
         return {};
     }
 
-    Result<TemperatureSample> TMP117::read() noexcept {
+    Result<TMP117::Sample> TMP117::read() noexcept {
         if (is_failed()) {
             return fail(ErrorCode::DISABLED, Step::TMP_READ, __LINE__, ErrorContext::from_device(addr_));
         }
@@ -34,7 +34,7 @@ namespace Sensor {
         }
 
         clear_failures();
-        return TemperatureSample{static_cast<int16_t>(*raw_u)};
+        return Sample{static_cast<int16_t>(*raw_u)};
     }
 
 } // namespace Sensor

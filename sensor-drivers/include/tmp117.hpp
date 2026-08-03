@@ -5,13 +5,10 @@
 #include "device_base.hpp"
 #include "errors.hpp"
 #include "i2c_bus.hpp"
-#include "samples.hpp"
 
 namespace Sensor {
 
     /// @defgroup sensors Sensor drivers
-
-    constexpr uint8_t TMP117_DEFAULT_ADDR = 0x48U;
 
     /// TI TMP117 temperature sensor, continuous conversion mode. After
     /// init() the sensor delivers a fresh sample every ~1s at 64-cycle
@@ -21,13 +18,31 @@ namespace Sensor {
     /// @ingroup sensors
     class TMP117 final : public DeviceBase {
       public:
+        struct Sample {
+            int16_t raw_value;
+
+            [[nodiscard]] constexpr float celsius() const noexcept {
+                return static_cast<float>(raw_value) / 128.0F;
+            }
+
+            [[nodiscard]] constexpr float fahrenheit() const noexcept {
+                return (celsius() * 9.0F / 5.0F) + 32.0F;
+            }
+
+            [[nodiscard]] constexpr float kelvin() const noexcept {
+                return celsius() + 273.15F;
+            }
+        };
+
+        static constexpr uint8_t DEFAULT_ADDR = 0x48U;
+
         explicit TMP117(I2CBus& bus, uint8_t addr) noexcept
             : bus_(bus),
               addr_(addr) {
         }
 
         explicit TMP117(I2CBus& bus) noexcept
-            : TMP117(bus, TMP117_DEFAULT_ADDR) {
+            : TMP117(bus, DEFAULT_ADDR) {
         }
 
         /// Verify device ID and switch to continuous conversion.
@@ -35,7 +50,7 @@ namespace Sensor {
 
         /// Read the raw temperature register and return a sample. Failures
         /// latch via DeviceBase.
-        [[nodiscard]] Result<TemperatureSample> read() noexcept;
+        [[nodiscard]] Result<Sample> read() noexcept;
 
       private:
         static constexpr uint8_t REG_TEMP = 0x00U;
@@ -47,7 +62,6 @@ namespace Sensor {
 
         static constexpr uint16_t CONFIG_CONTINUOUS = 0x0000U;
 
-      private:
         I2CBus& bus_;
         uint8_t addr_ = 0U;
     };

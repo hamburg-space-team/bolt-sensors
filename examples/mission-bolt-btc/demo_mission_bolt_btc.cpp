@@ -1,9 +1,10 @@
 #include <cinttypes>
+#include <cmath>
+#include <cstdint>
 #include <utility>
 
 #include "logger.hpp"
 
-#include "samples.hpp"
 #include "tmp117.hpp"
 
 #ifdef BUILD_TARGET_HARDWARE
@@ -70,9 +71,28 @@ int main() {
 
         if (!temp_sample) {
             print_error(temp_sample.error());
-        } else {
-            Logger::println("Raw Value: %d", temp_sample->raw_value);
+            continue;
         }
+
+        const float temp_c = temp_sample->celsius();
+        const float temp_f = temp_sample->fahrenheit();
+        const float temp_k = temp_sample->kelvin();
+
+        const auto temp_c_whole = static_cast<int16_t>(temp_c);
+        const auto temp_c_frac = static_cast<uint8_t>(std::abs(temp_c - static_cast<float>(temp_c_whole)) * 100.0F);
+
+        const auto temp_f_whole = static_cast<int16_t>(temp_f);
+        const auto temp_f_frac = static_cast<uint8_t>(std::abs(temp_f - static_cast<float>(temp_f_whole)) * 100.0F);
+
+        const auto temp_k_whole = static_cast<int16_t>(temp_k);
+        const auto temp_k_frac = static_cast<uint8_t>(std::abs(temp_k - static_cast<float>(temp_k_whole)) * 100.0F);
+
+        Logger::println("Raw Value: %d; "
+                        "Celsius: %d.%02u C; "
+                        "Fahrenheit: %d.%02u F; "
+                        "Kelvin: %d.%02u K",
+                        temp_sample->raw_value, temp_c_whole, temp_c_frac, temp_f_whole, temp_f_frac, temp_k_whole,
+                        temp_k_frac);
 
 #ifdef BUILD_TARGET_HARDWARE
         HAL_Delay(1000);
