@@ -1,7 +1,7 @@
 #include <cinttypes>
 #include <utility>
 
-#include "demo_print.hpp"
+#include "logger.hpp"
 
 #include "samples.hpp"
 #include "tmp117.hpp"
@@ -29,24 +29,24 @@ void board_uart_transmit(const uint8_t* data, std::size_t length) {
 #endif
 
 void print_error(const Sensor::Error& e) {
-    demo_println("===== Error =====");
-    demo_println("  Code:      %u", std::to_underlying(e.code));
-    demo_println("  Line:      %u", e.line);
-    demo_println("  Timestamp: %" PRIu32 " us", e.timestamp_us);
+    Logger::println("===== Error =====");
+    Logger::println("  Code:      %u", std::to_underlying(e.code));
+    Logger::println("  Line:      %u", e.line);
+    Logger::println("  Timestamp: %" PRIu32 " us", e.timestamp_us);
 
-    demo_print("  Trace:     [");
+    Logger::print("  Trace:     [");
     for (uint8_t i = 0U; i < e.depth; ++i) {
-        demo_print("0x%02X%s", std::to_underlying(e.trace[i]), (i < e.depth - 1U) ? " <- " : "");
+        Logger::print("0x%02X%s", std::to_underlying(e.trace[i]), (i < e.depth - 1U) ? " <- " : "");
     }
-    demo_println("]%s", e.truncated ? " (TRUNCATED)" : "");
+    Logger::println("]%s", e.truncated ? " (TRUNCATED)" : "");
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-union-access)
-    demo_println("  Context:   0x%08" PRIX32, e.context.raw);
+    Logger::println("  Context:   0x%08" PRIX32, e.context.raw);
 }
 
 #ifdef BUILD_TARGET_HARDWARE
 extern "C" int app_main(void) {
-    demo_print_init(board_uart_transmit);
+    Logger::init(board_uart_transmit);
 
     Sensor::CmsisI2CBus bus(&Driver_I2C1);
 #else
@@ -71,7 +71,7 @@ int main() {
         if (!temp_sample) {
             print_error(temp_sample.error());
         } else {
-            demo_println("Raw Value: %d", temp_sample->raw_value);
+            Logger::println("Raw Value: %d", temp_sample->raw_value);
         }
 
 #ifdef BUILD_TARGET_HARDWARE
