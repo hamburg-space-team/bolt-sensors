@@ -46,5 +46,3 @@ foreach(BOARD IN LISTS BOARDS)
         ${CMAKE_CURRENT_SOURCE_DIR}/examples/common/
     )
 endforeach()
-
-

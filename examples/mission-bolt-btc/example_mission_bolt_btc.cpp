@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <utility>
 
+#include "delay.hpp"
 #include "logger.hpp"
 
 #include "tmp117.hpp"
@@ -23,9 +24,6 @@ void board_uart_transmit(const uint8_t* data, std::size_t length) {
 }
 
 #else
-#include <chrono>
-#include <thread>
-
 #include "mock_i2c_bus.hpp"
 #endif
 
@@ -71,6 +69,7 @@ int main() {
 
         if (!temp_sample) {
             print_error(temp_sample.error());
+            delay(1000);
             continue;
         }
 
@@ -78,27 +77,26 @@ int main() {
         const float temp_f = temp_sample->fahrenheit();
         const float temp_k = temp_sample->kelvin();
 
-        const auto temp_c_whole = static_cast<int16_t>(temp_c);
+        const char* temp_c_sign = (temp_c < 0.0F) ? "-" : "";
+        const auto temp_c_whole = static_cast<uint16_t>(temp_c);
         const auto temp_c_frac = static_cast<uint8_t>(std::abs(temp_c - static_cast<float>(temp_c_whole)) * 100.0F);
 
+        const char* temp_f_sign = (temp_f < 0.0F) ? "-" : "";
         const auto temp_f_whole = static_cast<int16_t>(temp_f);
         const auto temp_f_frac = static_cast<uint8_t>(std::abs(temp_f - static_cast<float>(temp_f_whole)) * 100.0F);
 
-        const auto temp_k_whole = static_cast<int16_t>(temp_k);
+        const char* temp_k_sign = (temp_k < 0.0F) ? "-" : "";
+        const auto temp_k_whole = static_cast<uint16_t>(temp_k);
         const auto temp_k_frac = static_cast<uint8_t>(std::abs(temp_k - static_cast<float>(temp_k_whole)) * 100.0F);
 
         Logger::println("Raw Value: %d; "
-                        "Celsius: %d.%02u C; "
-                        "Fahrenheit: %d.%02u F; "
-                        "Kelvin: %d.%02u K",
-                        temp_sample->raw_value, temp_c_whole, temp_c_frac, temp_f_whole, temp_f_frac, temp_k_whole,
-                        temp_k_frac);
+                        "Celsius: %s%u.%02u C; "
+                        "Fahrenheit: %s%u.%02u F; "
+                        "Kelvin: %s%u.%02u K",
+                        temp_sample->raw_value, temp_c_sign, temp_c_whole, temp_c_frac, temp_f_sign, temp_f_whole,
+                        temp_f_frac, temp_k_sign, temp_k_whole, temp_k_frac);
 
-#ifdef BUILD_TARGET_HARDWARE
-        HAL_Delay(1000);
-#else
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-#endif
+        delay(1000);
     }
 
     return 0;
