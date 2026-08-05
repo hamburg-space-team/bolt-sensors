@@ -3,7 +3,6 @@ CompileFlags:
   Add:
     - -std=gnu++2b
     - -xc++
-    - -stdlib=libc++
     - -Isensor-interfaces/include
     - -Isensor-drivers/include
     - -Ihardware-adapters/include

@@ -22,23 +22,14 @@
                 "ms-vscode.cpptools",
                 "ms-vscode.cpptools-themes",
                 "xaver.clang-format",
-                "dbaeumer.vscode-eslint",
                 "mcu-debug.memory-view",
-                "ms-python.python",
-                "ms-python.vscode-pylance",
-                "ms-python.debugpy",
-                "ms-python.vscode-python-envs",
                 "DavidAnson.vscode-markdownlint",
                 "ms-vscode.vscode-serial-monitor",
-                "bradlc.vscode-tailwindcss",
                 "Arm.vscode-cmsis-debugger",
                 "Arm.keil-studio-pack",
-                "rust-lang.rust-analyzer"
+                "ms-vscode.cmake-tools"
             ],
             "settings": {
-                "clangd.arguments": [
-                    "--compile-commands-dir=${workspaceFolder}/examples/tmp"
-                ],
                 "git.alwaysSignOff": true
             }
         }
