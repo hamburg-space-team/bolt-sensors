@@ -35,14 +35,14 @@ set(BOARDS
 foreach(BOARD IN LISTS BOARDS)
     string(REPLACE "-" "_" BOARD_TARGET_NAME ${BOARD})
 
-    add_executable(demo_${BOARD_TARGET_NAME} examples/${BOARD}/demo_${BOARD_TARGET_NAME}.cpp)
+    add_executable(example_${BOARD_TARGET_NAME} examples/${BOARD}/example_${BOARD_TARGET_NAME}.cpp)
     
-    target_link_libraries(demo_${BOARD_TARGET_NAME} PRIVATE
+    target_link_libraries(example_${BOARD_TARGET_NAME} PRIVATE
         Sensors
         MockAdapters
     )
 
-    target_include_directories(demo_${BOARD_TARGET_NAME} PRIVATE
+    target_include_directories(example_${BOARD_TARGET_NAME} PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/examples/common/
     )
 endforeach()

@@ -34,4 +34,4 @@ solution:
     - pack: ARM::CMSIS-Driver_STM32@1.3.0
 
   projects:
-    - project: mission-bolt-btc/demo.cproject.yml
+    - project: mission-bolt-btc/example.cproject.yml

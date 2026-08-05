@@ -27,9 +27,9 @@ project:
     - ../../hardware-adapters/include
 
   groups:
-    - group: Demo
+    - group: Example
       files:
-        - file: demo_mission_bolt_btc.cpp
+        - file: example_mission_bolt_btc.cpp
 
     - group: Sensors
       files:

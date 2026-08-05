@@ -66,8 +66,6 @@
                 "gdbserver",
                 "--probe",
                 "cmsisdap:",
-                "--connect",
-                "attach",
                 "--persist",
                 "--reset-run",
                 "--cbuild-run",
@@ -130,9 +128,9 @@
             "args": [
                 "convert",
                 "-s",
-                "examples/demos.csolution.yml",
+                "examples/examples.csolution.yml",
                 "-c",
-                "demo.${input:buildType}+${input:boardTarget}"
+                "example.${input:buildType}+${input:boardTarget}"
             ],
             "problemMatcher": []
         },
@@ -150,7 +148,7 @@
             "label": "Context: Hardware Board",
             "dependsOn": "Configure: Hardware CSolution Compile Commands",
             "type": "shell",
-            "command": "cmake -E copy examples/out/demo/${input:boardTarget}/${input:buildType}/compile_commands.json .vscode/active_context/compile_commands.json && cmake -E touch .clangd",
+            "command": "cmake -E copy examples/out/example/${input:boardTarget}/${input:buildType}/compile_commands.json .vscode/active_context/compile_commands.json && cmake -E touch .clangd",
             "problemMatcher": []
         }
     ],
