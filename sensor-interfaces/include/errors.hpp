@@ -11,7 +11,7 @@ namespace Sensor {
     /// one of these codes back. See ADR-005 for how failures latch via
     /// DeviceBase.
     ///
-    /// @ingroup utils
+    /// @ingroup core
     enum class ErrorCode : uint8_t {
         /// I/O fault on a bus transaction
         BUS_ERROR = 1,
@@ -44,7 +44,7 @@ namespace Sensor {
     /// Ranges: 0x1x I2C bus, 0x2x MS5611, 0x3x TMP117, 0x4x AS7265X,
     /// 0x5x LP5810, 0x6x ICM4268x, 0x7x storage, 0x8x comms.
     ///
-    /// @ingroup utils
+    /// @ingroup core
     enum class Step : uint8_t {
         NONE = 0x00,
 
@@ -116,7 +116,7 @@ namespace Sensor {
     /// This acts as a tagged union where the active field is strictly determined
     /// by the accompanying ErrorCode.
     ///
-    /// @ingroup utils
+    /// @ingroup core
     union ErrorContext {
         uint32_t raw;              ///< use instead of interpreting the error in runtime
         uint8_t register_address;  ///< the specific hardware register targeted when the fault occured
@@ -167,7 +167,7 @@ namespace Sensor {
     /// FlightComputer sets this once at boot to Platform::tick_us; on the
     /// host (unit tests) it stays nullptr and timestamps read 0.
     ///
-    /// @ingroup utils
+    /// @ingroup core
     struct ErrorClock {
         using ClockFn = uint32_t (*)();
         // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
@@ -180,7 +180,7 @@ namespace Sensor {
     /// there). Built by fail() at the origin; every forwarding level
     /// appends itself with mark(). Fixed-size by design - see ADR-012.
     ///
-    /// @ingroup utils
+    /// @ingroup core
     struct Error {
         uint32_t timestamp_us = 0U;            ///< time of occurrence (ErrorClock at fail())
         ErrorContext context{0U};              ///< hardware payload (register, ID, or raw flags)
@@ -264,7 +264,7 @@ namespace Sensor {
     /// Project-wide expected alias: what every fallible flight-code call
     /// returns; `Result<void>` is the status-only variant.
     ///
-    /// @ingroup utils
+    /// @ingroup core
     template <typename T = void> using Result = std::expected<T, Error>;
 
 } // namespace Sensor

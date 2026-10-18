@@ -6,9 +6,13 @@
 
 namespace Sensor {
 
+    /// @defgroup interfaces Sensor interfaces
+
     /// Pure virtual interface for I2C communication.
     /// This acts as the boundary between hardware-agnostic sensor drivers
     /// and platform-specific hardware implementations.
+    ///
+    /// @ingroup interfaces
     class I2CBus {
       public:
         virtual ~I2CBus() = default;
