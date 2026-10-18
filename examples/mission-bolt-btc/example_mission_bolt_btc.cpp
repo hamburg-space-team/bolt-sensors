@@ -48,15 +48,26 @@ extern "C" int app_main(void) {
     Logger::init(board_uart_transmit);
 
     Sensor::CmsisI2CBus bus(&Driver_I2C1);
-#else
-int main() {
-    Sensor::MockI2CBus bus;
-#endif
 
     if (const auto r = bus.init(); !r) {
         print_error(r.error());
         return -1;
     }
+#else
+int main() {
+    Sensor::MockI2CBus bus;
+
+    const Sensor::MockI2CBus::RegisterMap tmp117_regs = {
+        {0x0FU, 0x0117U}, // Device ID   => Reg 0x0F
+        {0x01U, 0x00U},   // Config      => Reg 0x01
+        {0x00U, 0x0C80U}  // Temperature => Reg 0x00
+    };
+
+    if (const auto r = bus.init({{Sensor::TMP117::DEFAULT_ADDR, tmp117_regs}}); !r) {
+        print_error(r.error());
+        return -1;
+    }
+#endif
 
     Sensor::TMP117 tmp117(bus);
     if (const auto r = tmp117.init(); !r) {
