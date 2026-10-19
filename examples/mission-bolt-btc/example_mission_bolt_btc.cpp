@@ -25,6 +25,7 @@ void board_uart_transmit(const uint8_t* data, std::size_t length) {
 
 #else
 #include "mock_i2c_bus.hpp"
+#include "sensor_mock.hpp"
 #endif
 
 void print_error(const Sensor::Error& e) {
@@ -57,13 +58,7 @@ extern "C" int app_main(void) {
 int main() {
     Sensor::MockI2CBus bus;
 
-    const Sensor::MockI2CBus::RegisterMap tmp117_regs = {
-        {0x0FU, 0x0117U}, // Device ID   => Reg 0x0F
-        {0x01U, 0x00U},   // Config      => Reg 0x01
-        {0x00U, 0x0C80U}  // Temperature => Reg 0x00
-    };
-
-    if (const auto r = bus.init({{Sensor::TMP117::DEFAULT_ADDR, tmp117_regs}}); !r) {
+    if (const auto r = bus.init({{Sensor::TMP117::DEFAULT_ADDR, SensorMock::tmp117()}}); !r) {
         print_error(r.error());
         return -1;
     }
