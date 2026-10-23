@@ -36,14 +36,9 @@ namespace Sensor {
 
         static constexpr uint8_t DEFAULT_ADDR = 0x48U;
 
-        static constexpr uint8_t REG_TEMP = 0x00U;
-        static constexpr uint8_t REG_CONFIG = 0x01U;
-        static constexpr uint8_t REG_DEV_ID = 0x0FU;
-        static constexpr uint16_t DEV_ID_EXPECTED = 0x0117U;
-        static constexpr uint16_t CONFIG_CONTINUOUS = 0x0000U;
-
         explicit TMP117(I2CBus& bus, uint8_t addr) noexcept
             : bus_(bus),
+
               addr_(addr) {
         }
 
@@ -59,8 +54,6 @@ namespace Sensor {
         [[nodiscard]] Result<Sample> read() noexcept;
 
       private:
-        static constexpr uint16_t DEV_ID_MASK = 0x0FFFU;
-
         I2CBus& bus_;
         uint8_t addr_ = 0U;
     };
