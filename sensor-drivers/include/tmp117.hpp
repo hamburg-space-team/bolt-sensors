@@ -32,13 +32,20 @@ namespace Sensor {
             [[nodiscard]] constexpr float kelvin() const noexcept {
                 return celsius() + 273.15F;
             }
+
+            [[nodiscard]] constexpr bool operator==(const Sample& other) const noexcept {
+                return raw_value == other.raw_value;
+            }
+
+            [[nodiscard]] constexpr bool operator!=(const Sample& other) const noexcept {
+                return !(*this == other);
+            }
         };
 
         static constexpr uint8_t DEFAULT_ADDR = 0x48U;
 
         explicit TMP117(I2CBus& bus, uint8_t addr) noexcept
             : bus_(bus),
-
               addr_(addr) {
         }
 

@@ -34,5 +34,6 @@ project:
     - group: Sensors
       files:
         - file: ../../sensor-drivers/src/device_base.cpp
-        - file: ../../sensor-drivers/src/tmp117.cpp
         - file: ../../hardware-adapters/src/cmsis_i2c_bus.cpp
+        - file: ../../sensor-drivers/src/tmp117.cpp
+        - file: ../../sensor-drivers/src/icm42686.cpp

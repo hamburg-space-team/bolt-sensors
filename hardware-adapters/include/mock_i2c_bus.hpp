@@ -21,11 +21,14 @@ namespace Sensor {
     class MockI2CBus final : public I2CBus {
       public:
         using RegisterMap = std::map<uint8_t, uint16_t>; // register address -> value
+        using ByteMap = std::map<uint8_t, uint8_t>;      // memory address -> stored byte
 
         explicit MockI2CBus() noexcept = default;
 
         /// Must be called once before any read/write. Populates the bus with the given devices.
         [[nodiscard]] Result<void> init(std::initializer_list<std::pair<const uint8_t, RegisterMap>> devices) noexcept;
+        [[nodiscard]] Result<void>
+        init_memory(std::initializer_list<std::pair<const uint8_t, ByteMap>> devices) noexcept;
 
         /// Selects a specific register manually for a device on the bus.
         [[nodiscard]] Result<void> select_register(uint8_t addr, uint8_t reg) noexcept;
@@ -45,12 +48,15 @@ namespace Sensor {
         [[nodiscard]] Result<uint8_t> read_reg8(uint8_t addr, uint8_t reg) noexcept override;
         [[nodiscard]] Result<uint16_t> read_reg16(uint8_t addr, uint8_t reg) noexcept override;
 
+        [[nodiscard]] static ByteMap from_16bit(std::initializer_list<std::pair<uint8_t, uint16_t>> registers) noexcept;
+
       private:
         /// Per-device simulation state. Contains the register map and the register currently selected for a pending
         /// read (the I2C slave's register pointer).
         struct DeviceState {
-            RegisterMap registers;          ///< register address -> stored value
-            uint8_t selected_register = 0U; ///< register latched by the last write_read
+            RegisterMap registers;         ///< 16-bit registers
+            ByteMap memory;                ///< byte-addressable window (e.g., for burst reads)
+            uint8_t register_pointer = 0U; ///< register pointer that auto-increments (I2C slave behaviour)
         };
 
         std::map<uint8_t, DeviceState> devices_; ///< device address -> state; empty until init()

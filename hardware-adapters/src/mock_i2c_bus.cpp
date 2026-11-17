@@ -2,6 +2,7 @@
 #include "errors.hpp"
 
 #include <array>
+#include <cstdint>
 #include <expected>
 #include <initializer_list>
 
@@ -11,7 +12,16 @@ namespace Sensor {
         devices_.clear();
 
         for (const auto& [addr, reg_map] : devices) {
-            devices_.emplace(addr, DeviceState{reg_map, 0U});
+            devices_.emplace(addr, DeviceState{reg_map, {}, 0U});
+        }
+
+        return {};
+    }
+
+    Result<void> MockI2CBus::init_memory(std::initializer_list<std::pair<const uint8_t, ByteMap>> devices) noexcept {
+        for (const auto& [addr, memory] : devices) {
+            DeviceState& state = devices_[addr];
+            state.memory = memory;
         }
 
         return {};
@@ -23,13 +33,13 @@ namespace Sensor {
             return fail(ErrorCode::PROTOCOL_ERROR, Step::NONE, __LINE__, ErrorContext::from_device(addr));
         }
 
-        if (!device->second.registers.contains(reg)) {
+        if (!device->second.registers.contains(reg) && !device->second.memory.contains(reg)) {
             // NOTE: CmsisI2CBus uses from_device but register context might be better for debugging when using the
             // mock bus.
             return fail(ErrorCode::PROTOCOL_ERROR, Step::NONE, __LINE__, ErrorContext::from_register(reg));
         }
 
-        device->second.selected_register = reg;
+        device->second.register_pointer = reg;
         return {};
     }
 
@@ -37,7 +47,7 @@ namespace Sensor {
         if (devices_.empty()) {
             return fail(ErrorCode::BAD_ARGUMENT, Step::I2C_WRITE, __LINE__);
         }
-        if (len < 2U || len > 3U) {
+        if (len < 2U) {
             return fail(ErrorCode::BAD_ARGUMENT, Step::I2C_WRITE, __LINE__);
         }
 
@@ -47,7 +57,26 @@ namespace Sensor {
         }
 
         const uint8_t reg = data[0];
-        auto reg_it = device->second.registers.find(reg);
+
+        if (len > 3U) {
+            if (!device->second.memory.contains(reg)) {
+                // NOTE: CmsisI2CBus uses from_device but register context might be better for debugging when using the
+                // mock bus.
+                return fail(ErrorCode::PROTOCOL_ERROR, Step::I2C_WRITE, __LINE__, ErrorContext::from_register(reg));
+            }
+
+            // Set register pointer and then store data bytes with auto-increment.
+            device->second.register_pointer = reg;
+
+            for (std::size_t i = 1U; i < len; i++) {
+                device->second.memory[device->second.register_pointer] = data[i];
+                device->second.register_pointer++;
+            }
+
+            return {};
+        }
+
+        const auto reg_it = device->second.registers.find(reg);
         if (reg_it == device->second.registers.end()) {
             // NOTE: CmsisI2CBus uses from_device but register context might be better for debugging when using the
             // mock bus.
@@ -56,7 +85,7 @@ namespace Sensor {
 
         if (len == 3U) {
             reg_it->second = static_cast<uint16_t>((static_cast<uint16_t>(data[1]) << 8U) | data[2]);
-        } else if (len == 2U) {
+        } else {
             reg_it->second = data[1];
         }
 
@@ -67,7 +96,7 @@ namespace Sensor {
         if (devices_.empty()) {
             return fail(ErrorCode::BAD_ARGUMENT, Step::I2C_READ, __LINE__);
         }
-        if (len < 1U || len > 2U) {
+        if (len < 1U) {
             return fail(ErrorCode::BAD_ARGUMENT, Step::I2C_READ, __LINE__);
         }
 
@@ -76,13 +105,30 @@ namespace Sensor {
             return fail(ErrorCode::PROTOCOL_ERROR, Step::I2C_READ, __LINE__, ErrorContext::from_device(addr));
         }
 
-        // Retrieve register that should have been selected before calling a read.
-        const uint8_t reg = device->second.selected_register;
+        if (len > 2U) {
+            // Read bytes starting from the register pointer and auto-incrementing after each byte.
+            for (std::size_t i = 0U; i < len; i++) {
+                const uint8_t reg = device->second.register_pointer;
 
-        auto reg_it = device->second.registers.find(reg);
+                const auto reg_it = device->second.memory.find(reg);
+                if (reg_it == device->second.memory.end()) {
+                    // NOTE: CmsisI2CBus uses from_device but register context might be better for debugging when using
+                    // the mock bus.
+                    return fail(ErrorCode::PROTOCOL_ERROR, Step::I2C_READ, __LINE__, ErrorContext::from_register(reg));
+                }
+
+                data[i] = reg_it->second;
+                device->second.register_pointer = reg + 1U;
+            }
+
+            return {};
+        }
+
+        const uint8_t reg = device->second.register_pointer;
+        const auto reg_it = device->second.registers.find(reg);
         if (reg_it == device->second.registers.end()) {
-            // NOTE: CmsisI2CBus uses from_device but register context might be better for debugging when using the
-            // mock bus.
+            // NOTE: CmsisI2CBus uses from_device but register context might be better for debugging when using
+            // the mock bus.
             return fail(ErrorCode::PROTOCOL_ERROR, Step::I2C_READ, __LINE__, ErrorContext::from_register(reg));
         }
 
@@ -102,7 +148,7 @@ namespace Sensor {
         if (devices_.empty()) {
             return fail(ErrorCode::BAD_ARGUMENT, Step::I2C_WRITE_READ, __LINE__);
         }
-        if (tx_len < 1U || rx_len < 1U || rx_len > 2U) {
+        if (tx_len < 1U || rx_len < 1U) {
             return fail(ErrorCode::BAD_ARGUMENT, Step::I2C_WRITE_READ, __LINE__);
         }
 
@@ -112,14 +158,14 @@ namespace Sensor {
         }
 
         const uint8_t reg = tx[0];
-        if (!device->second.registers.contains(reg)) {
+        if (!device->second.registers.contains(reg) && !device->second.memory.contains(reg)) {
             // NOTE: CmsisI2CBus uses from_device but register context might be better for debugging when using the
             // mock bus.
             return fail(ErrorCode::PROTOCOL_ERROR, Step::I2C_WRITE_READ, __LINE__, ErrorContext::from_register(reg));
         }
 
-        // Select the register that should be read from (simulated write without stop condition).
-        device->second.selected_register = reg;
+        // Select the starting register for the read (simulated I2C repeated-start behaviour).
+        device->second.register_pointer = reg;
 
         return read(addr, rx, rx_len);
     }
@@ -151,6 +197,17 @@ namespace Sensor {
         }
 
         return static_cast<uint16_t>((static_cast<uint16_t>(buf[0]) << 8U) | static_cast<uint16_t>(buf[1]));
+    }
+
+    MockI2CBus::ByteMap MockI2CBus::from_16bit(std::initializer_list<std::pair<uint8_t, uint16_t>> registers) noexcept {
+        ByteMap result;
+
+        for (const auto& [reg, val] : registers) {
+            result[reg] = static_cast<uint8_t>(val >> 8U);
+            result[reg + 1U] = static_cast<uint8_t>(val & 0xFFU);
+        }
+
+        return result;
     }
 
 } // namespace Sensor

@@ -10,6 +10,7 @@ add_library(Sensors STATIC)
 target_sources(Sensors PRIVATE
     sensor-drivers/src/device_base.cpp
     sensor-drivers/src/tmp117.cpp
+    sensor-drivers/src/icm42686.cpp
 )
 
 target_include_directories(Sensors PUBLIC

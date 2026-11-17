@@ -9,7 +9,7 @@
 #include <thread>
 #endif
 
-inline static void delay(uint32_t ms) {
+inline static void delay(uint32_t ms) noexcept {
 #ifdef BUILD_TARGET_HARDWARE
     HAL_Delay(ms);
 #else

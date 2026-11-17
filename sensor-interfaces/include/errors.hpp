@@ -98,6 +98,7 @@ namespace Sensor {
         IMU_POWER_ON = 0x63,     ///< PWR_MGMT0 write
         IMU_READ = 0x64,         ///< read_sample(): burst data readout
         IMU_CONFIG_INT = 0x65,   ///< INT1 routing/config writes (data-ready)
+        IMU_INIT = 0x66,         ///< init(): wait_ms not set
 
         // Storage (SdStore)
         SD_INIT = 0x70,  ///< init(): card info readout
@@ -172,6 +173,31 @@ namespace Sensor {
         using ClockFn = uint32_t (*)();
         // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
         static inline ClockFn now_us = nullptr;
+
+        /// Raw cycle counter for interval measurements (wraps at 2^32)
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
+        static inline ClockFn now_cycles = nullptr;
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
+        static inline uint32_t cycles_per_us = 1U;
+
+        /// us between two now_cycles() samples. Subtract in the cycle domain -
+        /// the divided us clock wraps at 2^32/cycles_per_us, NOT a power of two,
+        /// so differences of us_now() values are wrong across a wrap
+        static uint32_t us_between(uint32_t cyc_start, uint32_t cyc_end) noexcept {
+            return (cyc_end - cyc_start) / cycles_per_us;
+        }
+
+        /// us between two now_us() stamps, for when only the divided clock was
+        /// sampled (a UART interrupt stamps its bytes that way). Correct across
+        /// one wrap of that clock, whose period 2^32/cycles_per_us is rounded
+        /// down here, so a wrapped interval reads at most 1 us short
+        static uint32_t us_elapsed(uint32_t us_start, uint32_t us_end) noexcept {
+            if (us_end >= us_start) {
+                return us_end - us_start;
+            }
+            const auto period = static_cast<uint32_t>((uint64_t{1} << 32U) / cycles_per_us);
+            return (period - us_start) + us_end;
+        }
     };
 
     /// The error value inside every Result<T>: what failed, where it was

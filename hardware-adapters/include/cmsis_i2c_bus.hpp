@@ -20,7 +20,7 @@ namespace Sensor {
     /// @ingroup adapter
     class CmsisI2CBus final : public I2CBus {
       public:
-        using TickFn = uint32_t (*)();
+        using TickFn = uint32_t (*)() noexcept;
 
         /// Core constructor requiring an explicit tick function for precise hardware timeouts.
         explicit CmsisI2CBus(ARM_DRIVER_I2C* drv, TickFn tick) noexcept

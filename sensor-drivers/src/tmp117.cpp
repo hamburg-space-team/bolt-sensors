@@ -8,17 +8,25 @@ namespace Sensor {
     Result<void> TMP117::init() noexcept {
         const auto dev_id = bus_.read_reg16(addr_, TMP117Registers::DEV_ID);
         if (!dev_id) {
-            return mark(dev_id.error(), Step::TMP_INIT);
+            const auto e = mark(dev_id.error(), Step::TMP_INIT);
+            disable(e.error());
+            return e;
         }
 
         if ((*dev_id & TMP117Registers::DEV_ID_MASK) != TMP117Registers::DEV_ID_EXPECTED) {
-            return fail(ErrorCode::PROTOCOL_ERROR, Step::TMP_ID_CHECK, __LINE__, ErrorContext::from_id(*dev_id));
+            const auto e =
+                fail(ErrorCode::PROTOCOL_ERROR, Step::TMP_ID_CHECK, __LINE__, ErrorContext::from_id(*dev_id));
+            disable(e.error());
+            return e;
         }
 
         if (const auto r = bus_.write_reg16(addr_, TMP117Registers::CONFIG, TMP117Registers::CONFIG_CONTINUOUS); !r) {
-            return mark(r.error(), Step::TMP_CONFIG);
+            const auto e = mark(r.error(), Step::TMP_CONFIG);
+            disable(e.error());
+            return e;
         }
 
+        clear_latch();
         return {};
     }
 
