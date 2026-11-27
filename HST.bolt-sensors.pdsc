@@ -19,6 +19,9 @@
   </keywords>
 
   <releases>
+    <release version="1.1.0" date="2026-11-27">
+      CMSIS-Driver I2C on the STM32 LL drivers (STM32U0, STM32L4).
+    </release>
     <release version="1.0.0" date="2026-06-14">
       Initial Release: HIC++ compliant sensor architecture.
     </release>
@@ -34,6 +37,13 @@
       <description>Requires the driver core (DeviceBase)</description>
       <require condition="Requires_Sensor_Interfaces"/>
       <require Cclass="Sensor" Cgroup="Drivers" Csub="Core"/>
+    </condition>
+
+    <condition id="Requires_STM32_LL_I2C">
+      <description>STM32 device whose I2C CubeMX generates on LL, and the Sensor Interfaces (ErrorClock)</description>
+      <require Dvendor="STMicroelectronics:13"/>
+      <require Cclass="Device" Cgroup="CubeMX"/>
+      <require condition="Requires_Sensor_Interfaces"/>
     </condition>
 
     <condition id="Requires_CMSIS_I2C">
@@ -80,6 +90,16 @@
       <files>
         <file category="include" name="hardware-adapters/include/"/>
         <file category="source" name="hardware-adapters/src/cmsis_i2c_bus.cpp"/>
+      </files>
+    </component>
+
+    <!-- implements the CMSIS-Driver I2C API: takes the place of Keil's HAL-based
+         CMSIS Driver:I2C on parts where I2C runs on LL (STM32U0, STM32L4) -->
+    <component Cclass="CMSIS Driver" Cgroup="I2C" Csub="STM32 LL" Capiversion="2.4.0" Cversion="1.0.0" condition="Requires_STM32_LL_I2C">
+      <description>CMSIS-Driver I2C on the STM32 LL drivers (Driver_I2C1..4 for the instances CubeMX configured)</description>
+      <files>
+        <file category="header" name="hardware-adapters/include/stm32_ll_i2c.hpp"/>
+        <file category="source" name="hardware-adapters/src/stm32_ll_i2c.cpp"/>
       </files>
     </component>
   </components>
