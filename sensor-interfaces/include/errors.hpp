@@ -108,9 +108,31 @@ namespace Sensor {
         SD_FLUSH = 0x74, ///< flush(): lfs_file_sync
 
         // Comms
-        PKT_BUILD = 0x80,    ///< PacketBuilder::build(): payload too large
-        CAN_TX_RING = 0x81,  ///< CAN TX frame ring latched (never drains)
-        UART_TX_RING = 0x82, ///< RS-422 TX byte ring latched (never drains)
+        PKT_BUILD = 0x80,     ///< PacketBuilder::build(): payload too large
+        CAN_TX_RING = 0x81,   ///< CAN TX frame ring latched (never drains)
+        UART_TX_RING = 0x82,  ///< RS-422 TX byte ring latched (never drains)
+        CAN_RX_FILTER = 0x83, ///< HAL_CAN_ConfigFilter refused the NODE_CMD filter bank
+
+        // LiFi transceiver host driver (ICD-008)
+        LIFI_LINK_WRITE = 0x90, ///< submit(): host UART TX ring refused the script
+        LIFI_REPLY = 0x91,      ///< poll(): NAK (PROTOCOL_ERROR), stray byte (BUS_ERROR), no reply in time (TIMEOUT)
+        LIFI_CONFIGURE = 0x92,  ///< configure(): role setup script
+        LIFI_SET_RATE = 0x93,   ///< set_rate(): optical baud change
+        LIFI_LOAD_SEND = 0x94,  ///< load_and_send(): '\s' block '\S'
+        LIFI_PING = 0x95,       ///< ping(): '\P' probe (self-test)
+        LIFI_ROUND = 0x96,      ///< EXP2 measurement: BER rounds in a row ended in a NAK or a missing ACK
+
+        // Clock
+        CLOCK_HSE_START = 0xA0, ///< boot: HSE not ready within HSE_STARTUP_TIMEOUT, SYSCLK from MSI or HSI16
+        CLOCK_LSE_START = 0xA1, ///< BTC boot: LSE not ready within LSE_STARTUP_TIMEOUT, RTC on the LSI
+
+        // MMC5983MA
+        MAGN_INIT = 0xB0,       ///< init(): wait_ms not set
+        MAGN_PRODUCT_ID = 0xB1, ///< PRODUCT_ID readout / mismatch
+        MAGN_RESET = 0xB2,      ///< ICR1 SW_RST + settle wait
+        MAGN_CONFIG = 0xB3,     ///< ICR1 (BW) and ICR2 (CMM) writes
+        MAGN_MEASURE = 0xB4,    ///< measure_polarity(): SR pulse + trigger measurement + MEAS_M_DONE poll
+        MAGN_READ = 0xB5,       ///< read_raw(): 7-byte burst readout
     };
 
     /// Hardware context payload detailing the specific state or data involved in a failed operation.

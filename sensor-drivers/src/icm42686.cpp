@@ -157,7 +157,7 @@ namespace Sensor {
         }
 
         std::array<uint8_t, 12> buf{};
-        uint8_t start_reg = ICM42686Registers::ACCEL_DATA_X1;
+        const uint8_t start_reg = ICM42686Registers::ACCEL_DATA_X1;
 
         auto r = bus_.write_read(addr_, &start_reg, 1U, buf.data(), buf.size());
         if (!r) {

@@ -11,6 +11,7 @@ target_sources(Sensors PRIVATE
     sensor-drivers/src/device_base.cpp
     sensor-drivers/src/tmp117.cpp
     sensor-drivers/src/icm42686.cpp
+    sensor-drivers/src/mmc5983ma.cpp
 )
 
 target_include_directories(Sensors PUBLIC

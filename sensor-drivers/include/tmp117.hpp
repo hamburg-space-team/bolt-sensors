@@ -19,7 +19,7 @@ namespace Sensor {
     class TMP117 final : public DeviceBase {
       public:
         struct Sample {
-            int16_t raw_value;
+            int16_t raw_value = 0;
 
             [[nodiscard]] constexpr float celsius() const noexcept {
                 return static_cast<float>(raw_value) / 128.0F;

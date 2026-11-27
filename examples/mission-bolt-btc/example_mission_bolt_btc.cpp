@@ -171,13 +171,13 @@ int main() {
                 float_to_string(imu_sample->accel_g_x(), ax);
                 float_to_string(imu_sample->accel_g_y(), ay);
                 float_to_string(imu_sample->accel_g_z(), az);
-                float_to_string(imu_sample->accel_mag(), accel_mag);
+                float_to_string(imu_sample->accel_g_mag(), accel_mag);
 
                 std::array<char, 16> gx{}, gy{}, gz{}, gyro_mag{};
                 float_to_string(imu_sample->gyro_dps_x(), gx);
                 float_to_string(imu_sample->gyro_dps_y(), gy);
                 float_to_string(imu_sample->gyro_dps_z(), gz);
-                float_to_string(imu_sample->gyro_mag(), gyro_mag);
+                float_to_string(imu_sample->gyro_dps_mag(), gyro_mag);
 
                 Logger::println("ICM42686\tAX %+6d\tAY %+6d\tAZ %+6d  |%7s %7s %7s g    |  |A| = %7s g \x1B[K",
                                 imu_sample->raw_ax, imu_sample->raw_ay, imu_sample->raw_az, ax.data(), ay.data(),

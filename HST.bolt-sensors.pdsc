@@ -60,6 +60,13 @@
         <file category="source" name="sensor-drivers/src/icm42686.cpp"/>
     </component>
 
+    <component Cclass="Sensor" Cgroup="Drivers" Csub="MMC5983MA" Cversion="1.0.0" condition="Requires_Sensor_Interfaces">
+      <description>ICM42686 IMU driver</description>
+      <files>
+        <file category="include" name="sensor-drivers/include/" />
+        <file category="source" name="sensor-drivers/src/mmc5983ma.cpp"/>
+    </component>
+
     <component Cclass="Sensor" Cgroup="Adapters" Csub="CMSIS I2C" Cversion="1.0.0" condition="Requires_CMSIS_I2C">
       <description>Uses CMSIS ARM_DRIVER_I2C API for I2C communication</description>
       <files>

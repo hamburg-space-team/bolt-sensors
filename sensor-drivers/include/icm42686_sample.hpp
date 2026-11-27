@@ -43,7 +43,7 @@ namespace Sensor {
             return std::sqrt(ax * ax + ay * ay + az * az);
         }
 
-        [[nodiscard]] constexpr float accel_mag() const noexcept {
+        [[nodiscard]] constexpr float accel_g_mag() const noexcept {
             return raw_accel_mag() / ACCEL_LSB_PER_G;
         }
 
@@ -67,7 +67,7 @@ namespace Sensor {
             return std::sqrt(gx * gx + gy * gy + gz * gz);
         }
 
-        [[nodiscard]] constexpr float gyro_mag() const noexcept {
+        [[nodiscard]] constexpr float gyro_dps_mag() const noexcept {
             return raw_gyro_mag() / GYRO_LSB_PER_DPS;
         }
 
