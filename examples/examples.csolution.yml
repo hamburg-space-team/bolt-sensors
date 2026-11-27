@@ -30,9 +30,10 @@ solution:
             - project-context: example_mission_bolt_exp3.Debug
 
   build-types:
+    # -Og: at -O0 the STM32U031C6 example does not fit its 32 KiB
     - type: Debug
       debug: on
-      optimize: none
+      optimize: debug
     - type: Release
       debug: off
       optimize: speed

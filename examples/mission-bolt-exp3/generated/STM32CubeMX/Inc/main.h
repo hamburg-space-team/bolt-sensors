@@ -125,6 +125,11 @@ void Error_Handler(void);
 #endif
 
 /* USER CODE BEGIN Private defines */
+/* CubeMX 6.19 emits the HAL name GPIO_AF0_RCC for PF1 OSC_EN even in an
+   LL project; AF0 is LL_GPIO_AF_0 */
+#ifndef GPIO_AF0_RCC
+#define GPIO_AF0_RCC LL_GPIO_AF_0
+#endif
 
 /* USER CODE END Private defines */
 

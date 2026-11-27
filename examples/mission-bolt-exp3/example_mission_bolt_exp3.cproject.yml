@@ -11,31 +11,34 @@ project:
         path: ./generated
         name: mission_bolt_exp3_config
 
+  # 32 KiB flash: drop unused functions
+  setups:
+    - setup: Fit the U031C6
+      misc:
+        - for-compiler: GCC
+          C-CPP:
+            - -ffunction-sections
+            - -fdata-sections
+          Link:
+            - -Wl,--gc-sections
+
+  # I2C on LL: CMSIS Driver:I2C:STM32 LL in place of Keil's HAL-based driver
   components:
     - component: Device:CubeMX
     - component: ARM::CMSIS:CORE
     - component: ARM::CMSIS-Compiler:CORE
-    - component: CMSIS Driver:I2C
     - component: Sensor:Interfaces
+    - component: Sensor:Drivers:Core
+    - component: Sensor:Drivers:TMP117
+    - component: Sensor:Drivers:MMC5983MA
+    - component: Sensor:Adapters:CMSIS I2C
     - component: CMSIS Driver:I2C:STM32 LL
 
   linker:
     - script: ./generated/STM32CubeMX/STM32CubeIDE/STM32U031C6TX_FLASH.ld
       for-compiler: GCC
 
-  add-path:
-    - ../../sensor-interfaces/include
-    - ../../sensor-drivers/include
-    - ../../hardware-adapters/include
-
   groups:
     - group: Example
       files:
         - file: example_mission_bolt_exp3.cpp
-
-    - group: Sensors
-      files:
-        - file: ../../sensor-drivers/src/device_base.cpp
-        - file: ../../hardware-adapters/src/stm32_ll_i2c.cpp
-        - file: ../../sensor-drivers/src/tmp117.cpp
-        - file: ../../sensor-drivers/src/mmc5983ma.cpp

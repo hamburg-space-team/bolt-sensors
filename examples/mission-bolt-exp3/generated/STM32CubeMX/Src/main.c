@@ -57,6 +57,7 @@ static void MX_DAC1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
+extern int app_main(void);
 
 /* USER CODE END PFP */
 
@@ -107,6 +108,7 @@ int main(void)
   MX_TIM2_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
+  app_main();
 
   /* USER CODE END 2 */
 

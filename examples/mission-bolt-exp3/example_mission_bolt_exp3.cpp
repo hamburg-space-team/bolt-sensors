@@ -12,24 +12,52 @@
 #include "logger.hpp"
 
 #include "mmc5983ma.hpp"
-#include "stm32_ll_i2c.hpp"
 #include "tmp117.hpp"
 
 #ifdef BUILD_TARGET_HARDWARE
 
 #include "cmsis_i2c_bus.hpp"
+#include "stm32_ll_i2c.hpp"
 
 #include "main.h" // IWYU pragma: keep
 
-extern "C" UART_HandleTypeDef hlpuart1; // still need the instance pointer
+namespace {
 
-void board_uart_transmit(const uint8_t* data, std::size_t length) {
-    for (std::size_t i = 0; i < length; ++i) {
-        while (!LL_USART_IsActiveFlag_TXE(USART1)) {
-        }
-        USART1->TDR = static_cast<uint8_t>(data[i]);
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables): written by SysTick
+    volatile uint32_t tick_ms = 0U;
+
+    // a byte at 115200 takes 87 us; the bound only keeps a dead UART from hanging the loop
+    constexpr uint32_t UART_BYTE_POLLS = 10000U;
+
+    // M0+: no DWT, so the error timestamps come from SysTick
+    uint32_t now_us() {
+        const uint32_t per_us = SystemCoreClock / 1000000U;
+        uint32_t ms = 0U;
+        uint32_t val = 0U;
+
+        // a tick between the two reads would pair a new ms with an old VAL
+        do {
+            ms = tick_ms;
+            val = SysTick->VAL;
+        } while (ms != tick_ms);
+
+        return (ms * 1000U) + ((SysTick->LOAD - val) / per_us);
     }
-    while (!LL_USART_IsActiveFlag_TC(USART1)) {
+
+} // namespace
+
+// NOLINTNEXTLINE(readability-identifier-naming): vector table name
+extern "C" void SysTick_Handler(void) {
+    tick_ms = tick_ms + 1U;
+}
+
+// USART1 (PA9/PA10), 115200 8N1, set up and enabled by MX_USART1_UART_Init
+void board_uart_transmit(const uint8_t* data, std::size_t length) {
+    for (std::size_t i = 0U; i < length; ++i) {
+        for (uint32_t n = 0U; LL_USART_IsActiveFlag_TXE_TXFNF(USART1) == 0U && n < UART_BYTE_POLLS; n++) {
+        }
+
+        LL_USART_TransmitData8(USART1, data[i]);
     }
 }
 
@@ -77,16 +105,14 @@ void float_to_string(float value, std::span<char> out) {
 extern "C" int app_main(void) {
     Logger::init(board_uart_transmit);
 
-    // Enable DWT cycle counter.
-    CoreDebug->DHCSR |= CoreDebug_DHCSR_C_DEBUGEN_Msk;
-    DWT->CYCCNT = 0U;
-    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+    // 1 ms SysTick with interrupt: now_us() and LL_mDelay() both run on it
+    (void)SysTick_Config(SystemCoreClock / 1000U);
 
-    Sensor::ErrorClock::now_us = []() -> uint32_t { return DWT->CYCCNT / (SystemCoreClock / 1000000U); };
-    Sensor::ErrorClock::now_cycles = []() -> uint32_t { return DWT->CYCCNT; };
-    Sensor::ErrorClock::cycles_per_us = SystemCoreClock / 1000000U;
+    Sensor::ErrorClock::now_us = now_us;
+    Sensor::ErrorClock::now_cycles = now_us; // the us clock doubles as the retry clock
+    Sensor::ErrorClock::cycles_per_us = 1U;
 
-    Sensor::CmsisI2CBus bus(&Driver_I2C1);
+    Sensor::CmsisI2CBus bus(&Driver_I2C1, []() noexcept -> uint32_t { return tick_ms; });
 
     if (const auto r = bus.init(); !r) {
         print_error(r.error(), "CmsisI2CBus");
