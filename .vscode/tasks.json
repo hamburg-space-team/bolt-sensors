@@ -6,16 +6,10 @@
         // ====================================================
         {
             "label": "CMSIS Erase",
-            "type": "shell",
+            "type": "cmsis-csolution.pyocd",
             "command": "pyocd",
             "options": {
-                "cwd": "${workspaceFolder}/examples",
-                "shell": {
-                    "executable": "/bin/bash",
-                    "args": [
-                        "-c"
-                    ]
-                }
+                "cwd": "${workspaceFolder}/examples"
             },
             "args": [
                 "erase",
@@ -29,16 +23,10 @@
         },
         {
             "label": "CMSIS Load",
-            "type": "shell",
+            "type": "cmsis-csolution.pyocd",
             "command": "pyocd",
             "options": {
-                "cwd": "${workspaceFolder}/examples",
-                "shell": {
-                    "executable": "/bin/bash",
-                    "args": [
-                        "-c"
-                    ]
-                }
+                "cwd": "${workspaceFolder}/examples"
             },
             "args": [
                 "load",
@@ -51,16 +39,10 @@
         },
         {
             "label": "CMSIS Run",
-            "type": "shell",
+            "type": "cmsis-csolution.pyocd",
             "command": "pyocd",
             "options": {
-                "cwd": "${workspaceFolder}/examples",
-                "shell": {
-                    "executable": "/bin/bash",
-                    "args": [
-                        "-c"
-                    ]
-                }
+                "cwd": "${workspaceFolder}/examples"
             },
             "args": [
                 "gdbserver",
@@ -99,7 +81,9 @@
                 }
             },
             "args": [
-                "list",
+                "info",
+                "--probe",
+                "cmsisdap:",
                 "--cbuild-run",
                 "${command:cmsis-csolution.getCbuildRunFile}"
             ],
@@ -124,14 +108,15 @@
         {
             "label": "Configure: Hardware CSolution Compile Commands",
             "type": "shell",
-            "command": "csolution",
-            "args": [
-                "convert",
-                "-s",
-                "examples/examples.csolution.yml",
-                "-c",
-                "example.${input:buildType}+${input:boardTarget}"
-            ],
+            "command": "csolution convert -s examples/examples.csolution.yml -c example_$(echo '${input:boardTarget}' | tr '-' '_').${input:buildType}+${input:boardTarget}",
+            // "command": "csolution",
+            // "args": [
+            //     "convert",
+            //     "-s",
+            //     "examples/examples.csolution.yml",
+            //     "-c",
+            //     "example.${input:buildType}+${input:boardTarget}"
+            // ],
             "problemMatcher": []
         },
         // ==========================================================
@@ -148,7 +133,7 @@
             "label": "Context: Hardware Board",
             "dependsOn": "Configure: Hardware CSolution Compile Commands",
             "type": "shell",
-            "command": "cmake -E copy examples/out/example/${input:boardTarget}/${input:buildType}/compile_commands.json .vscode/active_context/compile_commands.json && cmake -E touch .clangd",
+            "command": "cmake -E copy examples/out/example_$(echo '${input:boardTarget}' | tr '-' '_')/${input:boardTarget}/${input:buildType}/compile_commands.json .vscode/active_context/compile_commands.json && cmake -E touch .clangd",
             "problemMatcher": []
         }
     ],
@@ -161,7 +146,8 @@
             "type": "pickString",
             "description": "Select Board Environment",
             "options": [
-                "mission-bolt-btc"
+                "mission-bolt-btc",
+                "mission-bolt-exp3"
             ],
             "default": "mission-bolt-btc"
         },

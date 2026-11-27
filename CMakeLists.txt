@@ -32,6 +32,7 @@ target_include_directories(MockAdapters PUBLIC
 # Example executables for different boards
 set(BOARDS
     "mission-bolt-btc"
+    "mission-bolt-exp3"
 )
 
 foreach(BOARD IN LISTS BOARDS)

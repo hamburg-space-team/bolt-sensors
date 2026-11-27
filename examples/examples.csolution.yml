@@ -18,6 +18,16 @@ solution:
   target-types:
     - type: mission-bolt-btc
       device: STM32L476RGTx
+      target-set:
+        - set:
+          images:
+            - project-context: example_mission_bolt_btc.Debug
+    - type: mission-bolt-exp3
+      device: STM32U031C6Tx
+      target-set:
+        - set:
+          images:
+            - project-context: example_mission_bolt_exp3.Debug
 
   build-types:
     - type: Debug
@@ -31,7 +41,12 @@ solution:
     - pack: ARM::CMSIS@6.3.0
     - pack: ARM::CMSIS-Compiler@2.2.0
     - pack: Keil::STM32L4xx_DFP@3.1.0
+    - pack: Keil::STM32U0xx_DFP@2.2.0
     - pack: ARM::CMSIS-Driver_STM32@1.3.0
+    - pack: HST::bolt-sensors
+      path: ../
 
   projects:
-    - project: mission-bolt-btc/example.cproject.yml
+    - project: mission-bolt-btc/example_mission_bolt_btc.cproject.yml
+    - project: mission-bolt-exp3/example_mission_bolt_exp3.cproject.yml
+  created-for: CMSIS-Toolbox@2.12.0

@@ -11,7 +11,8 @@
 
 inline static void delay(uint32_t ms) noexcept {
 #ifdef BUILD_TARGET_HARDWARE
-    HAL_Delay(ms);
+    // HAL_Delay(ms);
+    LL_mDelay(ms);
 #else
     std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 #endif
