@@ -85,11 +85,12 @@
       </files>
     </component>
 
-    <component Cclass="Sensor" Cgroup="Drivers" Csub="MMC5983MA" Cversion="1.0.0" condition="Requires_Sensor_Interfaces">
-      <description>ICM42686 IMU driver</description>
+    <component Cclass="Sensor" Cgroup="Drivers" Csub="MMC5983MA" Cversion="1.0.0" condition="Requires_Sensor_Core">
+      <description>MMC5983MA magnetometer driver</description>
       <files>
         <file category="include" name="sensor-drivers/include/" />
         <file category="source" name="sensor-drivers/src/mmc5983ma.cpp"/>
+      </files>
     </component>
 
     <component Cclass="Sensor" Cgroup="Adapters" Csub="CMSIS I2C" Cversion="1.0.0" condition="Requires_CMSIS_I2C">
