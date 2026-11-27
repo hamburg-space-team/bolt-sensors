@@ -30,6 +30,12 @@
       <require Cclass="Sensor" Cgroup="Interfaces"/>
     </condition>
 
+    <condition id="Requires_Sensor_Core">
+      <description>Requires the driver core (DeviceBase)</description>
+      <require condition="Requires_Sensor_Interfaces"/>
+      <require Cclass="Sensor" Cgroup="Drivers" Csub="Core"/>
+    </condition>
+
     <condition id="Requires_CMSIS_I2C">
       <description>Requires Interfaces and ARM CMSIS I2C Driver</description>
       <require condition="Requires_Sensor_Interfaces"/>
@@ -45,7 +51,15 @@
       </files>
     </component>
 
-    <component Cclass="Sensor" Cgroup="Drivers" Csub="TMP117" Cversion="1.0.0" condition="Requires_Sensor_Interfaces">
+    <component Cclass="Sensor" Cgroup="Drivers" Csub="Core" Cversion="1.0.0" condition="Requires_Sensor_Interfaces">
+      <description>Failure latch and wait service shared by all drivers (DeviceBase)</description>
+      <files>
+        <file category="include" name="sensor-drivers/include/"/>
+        <file category="source" name="sensor-drivers/src/device_base.cpp"/>
+      </files>
+    </component>
+
+    <component Cclass="Sensor" Cgroup="Drivers" Csub="TMP117" Cversion="1.0.0" condition="Requires_Sensor_Core">
       <description>TMP117 Temperature Sensor driver</description>
       <files>
         <file category="include" name="sensor-drivers/include/"/>
@@ -53,11 +67,12 @@
       </files>
     </component>
 
-    <component Cclass="Sensor" Cgroup="Drivers" Csub="ICM42686" Cversion="1.0.0" condition="Requires_Sensor_Interfaces">
+    <component Cclass="Sensor" Cgroup="Drivers" Csub="ICM42686" Cversion="1.0.0" condition="Requires_Sensor_Core">
       <description>ICM42686 IMU driver</description>
       <files>
         <file category="include" name="sensor-drivers/include/" />
         <file category="source" name="sensor-drivers/src/icm42686.cpp"/>
+      </files>
     </component>
 
     <component Cclass="Sensor" Cgroup="Adapters" Csub="CMSIS I2C" Cversion="1.0.0" condition="Requires_CMSIS_I2C">
